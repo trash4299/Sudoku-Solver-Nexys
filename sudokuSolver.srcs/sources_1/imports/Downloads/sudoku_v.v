@@ -1,48 +1,42 @@
-module sudoku_v(input start,input[323:0] enter,output readyToStart,output[323:0] out);
+module sudoku_v(input start,input[323:0] enter,output reg readyToStart,output[323:0] out);
 	
 	reg [8:0] maybes [8:0][8:0];
 	integer MC,x,y,ex,why,i,k,n,h,g;
     integer f,a,b,r,s,differenc,counte;
-	reg readyToStar;
-	
-	assign readyToStart = readyToStar;
-	
-	initial
-	begin
-		readyToStar <= 0;
-		//requires the numbers to be imported as 4-bit numbers, reading left to right and top down
-		for(i = 0; i < 9; i = i + 1) begin : row
-			for(k = 0; k < 9; k = k + 1) begin : column
-				ex = 4*(i*9+k);
-				case(enter[ex+:3])
-					4'b0000: maybes[i][k] <= "111111111";
-					4'b0001: maybes[i][k] <= "000000001";
-					4'b0010: maybes[i][k] <= "000000010";
-					4'b0011: maybes[i][k] <= "000000100";
-					4'b0100: maybes[i][k] <= "000001000";
-					4'b0101: maybes[i][k] <= "000010000";
-					4'b0110: maybes[i][k] <= "000100000";
-					4'b0111: maybes[i][k] <= "001000000";
-					4'b1000: maybes[i][k] <= "010000000";
-					4'b1001: maybes[i][k] <= "100000000";
-				endcase
-			end
-		end
-		
-		MC <= 0;
-		readyToStar <= 1;
-	end
+    
+	initial readyToStart = 1;
 	
 	always @(*) begin
 		if(MC == 0) begin
-		  x <= 0;
-		  y <= 0;
-		  if(start == 1) begin
-		      MC <= 1;
-		      readyToStar <= 0;
-          end
+			readyToStart <= 0;
+			//requires the numbers to be imported as 4-bit numbers, reading left to right and top down
+			for(i = 0; i < 9; i = i + 1) begin : row
+				for(k = 0; k < 9; k = k + 1) begin : column
+					case(enter[4*(i*9+k)+:3])
+						4'b0000: maybes[i][k] <= "111111111";
+						4'b0001: maybes[i][k] <= "000000001";
+						4'b0010: maybes[i][k] <= "000000010";
+						4'b0011: maybes[i][k] <= "000000100";
+						4'b0100: maybes[i][k] <= "000001000";
+						4'b0101: maybes[i][k] <= "000010000";
+						4'b0110: maybes[i][k] <= "000100000";
+						4'b0111: maybes[i][k] <= "001000000";
+						4'b1000: maybes[i][k] <= "010000000";
+						4'b1001: maybes[i][k] <= "100000000";
+					endcase
+				end
+			end
+			MC = 1;
 		end
 		else if(MC == 1) begin
+			x <= 0;
+			y <= 0;
+			if(start == 1) begin
+				MC <= 1;
+				readyToStart <= 0;
+			end
+		end
+		else if(MC == 2) begin
 			//all checking tasks
 			for(x = 0;x < 9;x = x + 1) begin
 				for(y = 0;y < 9; y = y + 1) begin
@@ -67,8 +61,8 @@ module sudoku_v(input start,input[323:0] enter,output readyToStart,output[323:0]
 			end
 		end
 		
-		else if(MC == 2) begin
-			//assign out pins using finnum task
+		else if(MC == 3) begin
+			//assign output vector using finnum task
 		end
 		
 	end
