@@ -5,7 +5,6 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	input[3:0] enter,
 	//input[323:0] enter,
 	output reg readyToStart = 0,
-	output reg busy = 0,
 	output reg done = 0,
 	//output reg[323:0] outputs);
 	output reg[3:0] outputs = 4'b0000);
@@ -13,7 +12,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	reg [728:0] maybes;
 	integer MC = 0,x = 0,y = 0,ex,why,i,k,n,h,g;
 	integer f,a,b,r,s,differenc,counte,inOutCount = 0;
-	parameter ready = 4'd0, load = 4'd1, tasks = 4'd2, finish = 4'd3;
+	parameter ready = 4'd0, load = 4'd1, tasks = 4'd2, donzo = 4'd3, finish = 4'd4;
 	
 	always @(posedge clk) begin
 		case(MC)
@@ -23,12 +22,13 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				outputs <= 4'b0000;
 				done <= 0;
 				readyToStart <= 1;
-				if(start == 1)
+				if(start == 1) begin
 					MC <= load;
+					readyToStart <= 0;
+				end
 			end
 			
-			load: begin  //CHANGE TO SERIAL INPUT
-				
+			load: begin
 				if(x == 8) begin
 					y <= y + 1;
 					x <= 0;
@@ -36,7 +36,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				else
 					x <= x + 1;
 				
-				case(enter[323-4*(y*9+x)-:4])
+				case(enter)
 					4'd0: maybes[728-9*(y*9+x)-:9] <= 9'b111111111;
 					4'd1: maybes[728-9*(y*9+x)-:9] <= 9'b000000001;
 					4'd2: maybes[728-9*(y*9+x)-:9] <= 9'b000000010;
@@ -48,7 +48,6 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 					4'd8: maybes[728-9*(y*9+x)-:9] <= 9'b010000000;
 					4'd9: maybes[728-9*(y*9+x)-:9] <= 9'b100000000;
 				endcase
-						
 				inOutCount <= inOutCount + 1;
 				
 				if(inOutCount == 81) begin
@@ -84,17 +83,6 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 			
 			tasks: begin
 				//checking tasks
-				if(x == 8 && y == 8) begin
-					x <= 0;
-					y <= 0;
-				end
-				else if(x == 8) begin
-					y <= y + 1;
-					x <= 0;
-				end
-				else
-					x <= x + 1;
-				
 				if(findFinal(x,y) == 0) begin
 					colChecker();
 					rowChecker();
@@ -102,11 +90,40 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 					horiEightNine();
 					//squareChecker();
 				end
-				if(donzo(1)) begin
+				if(x == 8 && y == 8) begin
 					x <= 0;
 					y <= 0;
-					MC <= finish;
-					done <= 1;
+					n <= 0;
+					MC <= donzo;
+				end
+				else if(x == 8) begin
+					y <= y + 1;
+					x <= 0;
+				end
+				else
+					x <= x + 1;
+			end
+			
+			donzo: begin
+				if(x == 8) begin
+					y <= y + 1;
+					x <= 0;
+				end
+				else
+					x <= x + 1;
+				
+				if(findFinal(x,y) != 4'b0)
+					n = n + 1;
+				
+				if(x == 8 && y == 8) begin
+					x <= 0;
+					y <= 0;
+					if(n == 81) begin
+						MC <= finish;
+						done <= 1;
+					end
+					else
+						MC <= tasks;
 				end
 			end
 			
@@ -123,6 +140,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				
 				if(inOutCount == 81) begin
 					MC <= ready;
+					done <= 0;
 					inOutCount <= 0;
 				end
 			end
@@ -147,7 +165,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	//rowpossibilities ??
 	//colpossibilities ??
 	
-	
+	//findFinal NEEDS MAJOR RECONSTRUCTION TO REDUCE LUT COUNT
 	function [3:0] findFinal; //returns 0 is the cell is not final
 		input [3:0] ex;
 		input [3:0] why;
@@ -164,25 +182,6 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 			9'b100000000: findFinal = 4'd9;
 			default: findFinal = 4'd0;
 		endcase
-	endfunction
-	
-	function donzo;
-		input hmmm;
-		
-		begin
-			n = 0;
-			for(h = 0; h < 9; h = h + 1) begin
-				for(g = 0; g < 9; g = g + 1) begin
-					if(findFinal(h,g) != 4'b0)
-						n = n + 1;
-				end
-			end
-			if (n == 81) begin
-				donzo = 1;
-			end
-			else 
-				donzo = 0;
-		end
 	endfunction
 	
 	//rowchecker task
@@ -224,7 +223,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 		end
 	endtask
 	
-	// squarechecker task				TURN INTO STATE  MACHINE
+	// squarechecker task
 	// task squareChecker; begin
 		// a <= x/3;
 		// b <= y/3;
