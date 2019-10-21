@@ -5,3 +5,5 @@ Hi, I am only uploading some of the files for the time being. When I get further
 
 I need to fix my sudoku module so that I can actually fit it on to the FPGA. Rght now, my design would use 266% of the slice LUTs on the Nexys Video. The sudoku module needs 358,555 slice LUTs while the Nexys Video only has 134,600. It is mainly the giant vector of maybes that is the problem. 
 I know I could put the actual Sudoku solving in C code in the SDK and use the microblaze, but I want to challenge myself with this. Making a C version is probably next.
+
+I a Dumb. So tasks are NOT synthesizable so changing those might be helpful. Anyways, I am working on creating a simpler solver module. It will be closer to how the recursive solver flowed where it just does trial and error and progresses the cells in order. This should significantly decrease LUT usage. 
