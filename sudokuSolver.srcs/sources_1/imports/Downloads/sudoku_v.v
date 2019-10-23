@@ -10,8 +10,8 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	output reg[3:0] outputs = 4'b0000);
 	
 	reg [728:0] maybes;
-	integer MC = 0,x = 0,y = 0,ex,why,i,k,n,h,g;
-	integer f,a,b,r,s,differenc,counte,inOutCount = 0;
+	integer MC = 0,x = 0,y = 0,i,k,n,h,g;
+	integer f,r,s,inOutCount = 0;
 	parameter ready = 4'd0, load = 4'd1, tasks = 4'd2, donzo = 4'd3, finish = 4'd4;
 	
 	always @(posedge clk) begin
@@ -166,49 +166,290 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	//colpossibilities ??
 	
 	//findFinal NEEDS MAJOR RECONSTRUCTION TO REDUCE LUT COUNT
-	function [3:0] findFinal; //returns 0 is the cell is not final
+	function automatic [3:0] findFinal; //returns 0 is the cell is not final
 		input [3:0] ex;
 		input [3:0] why;
-		
-		case(maybes[728-9*(why*9+ex)-:9])
-			9'b000000001: findFinal = 4'd1;
-			9'b000000010: findFinal = 4'd2;
-			9'b000000100: findFinal = 4'd3;
-			9'b000001000: findFinal = 4'd4;
-			9'b000010000: findFinal = 4'd5;
-			9'b000100000: findFinal = 4'd6;
-			9'b001000000: findFinal = 4'd7;
-			9'b010000000: findFinal = 4'd8;
-			9'b100000000: findFinal = 4'd9;
-			default: findFinal = 4'd0;
-		endcase
+		begin
+			case(maybes[728-9*(why*9+ex)-:9])
+				9'b000000001: findFinal = 4'd1;
+				9'b000000010: findFinal = 4'd2;
+				9'b000000100: findFinal = 4'd3;
+				9'b000001000: findFinal = 4'd4;
+				9'b000010000: findFinal = 4'd5;
+				9'b000100000: findFinal = 4'd6;
+				9'b001000000: findFinal = 4'd7;
+				9'b010000000: findFinal = 4'd8;
+				9'b100000000: findFinal = 4'd9;
+				default: findFinal = 4'd0;
+			endcase
+		end
 	endfunction
 	
 	//rowchecker task
-	task rowChecker;
-		for(f = 0; f < 9; f = f + 1) begin
-			if(f != y) begin
-				case(findFinal(x,f))
-					4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
-					4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
-					4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
-					4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
-					4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
-					4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
-					4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
-					4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
-					4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
-				endcase
-			end
+	task automatic rowChecker; begin
+		if(y != 0) begin
+			case(findFinal(x,4'd0))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
 		end
+		if(y != 4'd1) begin
+			case(findFinal(x,4'd1))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd2) begin
+			case(findFinal(x,4'd2))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd3) begin
+			case(findFinal(x,4'd3))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd4) begin
+			case(findFinal(x,4'd4))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd5) begin
+			case(findFinal(x,4'd5))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd6) begin
+			case(findFinal(x,4'd6))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd7) begin
+			case(findFinal(x,4'd7))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(y != 4'd8) begin
+			case(findFinal(x,4'd8))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+	end
 	endtask
 	
 	//colchecker task
-	task colChecker;
-		for(f = 0; f < 9; f = f + 1) begin
-			if(f != x) begin
-				case(findFinal(f,y))
-//					4'd0: break;	//does nothing if returns 0 because it is not final
+	task automatic colChecker; begin
+		if(x != 4'd0) begin
+			case(findFinal(4'd0,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd1) begin
+			case(findFinal(4'd1,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd2) begin
+			case(findFinal(4'd2,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd3) begin
+			case(findFinal(4'd3,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd4) begin
+			case(findFinal(4'd4,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd5) begin
+			case(findFinal(4'd5,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd6) begin
+			case(findFinal(4'd6,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd7) begin
+			case(findFinal(4'd7,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+		if(x != 4'd8) begin
+			case(findFinal(4'd8,y))
+				4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+				4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+				4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+				4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+				4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+				4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+				4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+				4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+				4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+			endcase
+		end
+	end
+	endtask
+	
+	//squarechecker task
+	task automatic squareChecker;
+		integer a,b;
+	begin
+		if(x <= 4'd2)
+			a = 0;
+		else if(x <= 4'd5)
+			a = 1;
+		else //if(x <= 4'd8)
+			a = 2;
+			
+		if(y <= 4'd2)
+			b = 0;
+		else if(y <= 4'd5)
+			b = 1;
+		else //if(y <= 4'd8)
+			b = 2;
+		
+		if(x != 3*a) begin
+			if(y != 3*b) begin
+				case(findFinal((3*a),(3*b)))
 					4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
 					4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
 					4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
@@ -217,23 +458,47 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 					4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
 					4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
 					4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
-					4'd9: maybes[728-9*(y*9+x)-:1]   <= 0;
+					4'd9: maybes[728-9*(y*9+x)  -:1] <= 0;
 				endcase
 			end
 		end
-	endtask
-	
-	// squarechecker task
-	// task squareChecker; begin
-		// a <= x/3;
-		// b <= y/3;
+		if(x != 3*a+3'd1) begin
+			if(y != 3*b+3'd1) begin
+				case(findFinal((3*a+3'd1),(3*b+3'd1)))
+					4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+					4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+					4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+					4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+					4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+					4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+					4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+					4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+					4'd9: maybes[728-9*(y*9+x)  -:1] <= 0;
+				endcase
+			end
+		end
+		if(x != 3*a+3'd2) begin
+			if(y != 3*b+3'd2) begin
+				case(findFinal((3*a+3'd2),(3*b+3'd2)))
+					4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
+					4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
+					4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
+					4'd4: maybes[728-9*(y*9+x)-5-:1] <= 0;
+					4'd5: maybes[728-9*(y*9+x)-4-:1] <= 0;
+					4'd6: maybes[728-9*(y*9+x)-3-:1] <= 0;
+					4'd7: maybes[728-9*(y*9+x)-2-:1] <= 0;
+					4'd8: maybes[728-9*(y*9+x)-1-:1] <= 0;
+					4'd9: maybes[728-9*(y*9+x)  -:1] <= 0;
+				endcase
+			end
+		end
 		
 		// for(r=(3*a);r<(3*a+3);r=r+1) begin
 			// for(s=(3*b);s<(3*b+3);s=s+1) begin
 				// if(x!=r) begin
 					// if(y!=s) begin
 						// case(findFinal(r,s))
-							// 4'd0: break;	//does nothing if returns 0 because it is not final
+							// //4'd0: break;	//does nothing if returns 0 because it is not final
 							// 4'd1: maybes[728-9*(y*9+x)-8-:1] <= 0;
 							// 4'd2: maybes[728-9*(y*9+x)-7-:1] <= 0;
 							// 4'd3: maybes[728-9*(y*9+x)-6-:1] <= 0;
@@ -248,8 +513,8 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				// end
 			// end
 		// end
-	// end
-	// endtask
+	end
+	endtask
 	
 	// task squareChecker; begin
 		// if(x <= 2) begin
@@ -450,64 +715,332 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	// endtask
 	
 	//horiEightNine
-	task horiEightNine;
-	begin
-		counte <= 0;
-		differenc <= 0;
-		for(r = 0; r < 9; r = r + 1) begin
-			if(findFinal(r,y)!=0) begin
-				counte <= counte + 1;
-				differenc <= differenc + findFinal(r,y);
+	task automatic horiEightNine;
+	integer counte, differenc;
+		begin
+			counte = 0;
+			differenc = 0;
+			if(findFinal(4'd0,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd0,y);
 			end
-		end
-		if(counte == 8) begin
-			for(r = 0; r < 9; r = r + 1) begin
-				if(findFinal(r,y) == 0) begin
+			if(findFinal(4'd1,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd1,y);
+			end
+			if(findFinal(4'd2,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd2,y);
+			end
+			if(findFinal(4'd3,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd3,y);
+			end
+			if(findFinal(4'd4,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd4,y);
+			end
+			if(findFinal(4'd5,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd5,y);
+			end
+			if(findFinal(4'd6,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd6,y);
+			end
+			if(findFinal(4'd7,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd7,y);
+			end
+			if(findFinal(4'd8,y) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(4'd8,y);
+			end
+			
+			if(counte == 8) begin
+				if(findFinal(4'd0,y) == 0) begin
 					case(45-differenc)
-						4'd1: maybes[728-9*(y*9+r)-:9] <= 9'b000000001;
-						4'd2: maybes[728-9*(y*9+r)-:9] <= 9'b000000010;
-						4'd3: maybes[728-9*(y*9+r)-:9] <= 9'b000000100;
-						4'd4: maybes[728-9*(y*9+r)-:9] <= 9'b000001000;
-						4'd5: maybes[728-9*(y*9+r)-:9] <= 9'b000010000;
-						4'd6: maybes[728-9*(y*9+r)-:9] <= 9'b000100000;
-						4'd7: maybes[728-9*(y*9+r)-:9] <= 9'b001000000;
-						4'd8: maybes[728-9*(y*9+r)-:9] <= 9'b010000000;
-						4'd9: maybes[728-9*(y*9+r)-:9] <= 9'b100000000;
+						4'd1: maybes[728-9*(y*9+0)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+0)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+0)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+0)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+0)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+0)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+0)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+0)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+0)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd1,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+1)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+1)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+1)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+1)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+1)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+1)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+1)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+1)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+1)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd2,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+2)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+2)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+2)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+2)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+2)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+2)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+2)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+2)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+2)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd3,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+3)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+3)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+3)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+3)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+3)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+3)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+3)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+3)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+3)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd4,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+4)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+4)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+4)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+4)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+4)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+4)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+4)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+4)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+4)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd5,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+5)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+5)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+5)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+5)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+5)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+5)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+5)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+5)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+5)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd6,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+6)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+6)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+6)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+6)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+6)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+6)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+6)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+6)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+6)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd7,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+7)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+7)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+7)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+7)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+7)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+7)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+7)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+7)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+7)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(4'd8,y) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(y*9+8)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(y*9+8)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(y*9+8)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(y*9+8)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(y*9+8)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(y*9+8)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(y*9+8)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(y*9+8)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(y*9+8)-:9] <= 9'b100000000;
 					endcase
 				end
 			end
 		end
-	end
 	endtask
 	
-	//vertEightNine 
-	task vertEightNine;
-	begin
-		counte <= 0;
-		differenc <= 0;
-		for(r = 0; r < 9; r = r + 1) begin
-			if(findFinal(x,r)!=0) begin
-				counte <= counte + 1;
-				differenc <= differenc + findFinal(x,r);
+	//vertEightNine
+	task automatic vertEightNine;
+	integer counte, differenc;
+		begin
+			counte = 0;
+			differenc = 0;
+			if(findFinal(x,4'd0) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd0);
 			end
-		end
-		if(counte == 8) begin
-			for(r = 0; r < 9; r = r + 1) begin
-				if(findFinal(x,r) == 0) begin
+			if(findFinal(x,4'd1) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd1);
+			end
+			if(findFinal(x,4'd2) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd2);
+			end
+			if(findFinal(x,4'd3) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd3);
+			end
+			if(findFinal(x,4'd4) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd4);
+			end
+			if(findFinal(x,4'd5) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd5);
+			end
+			if(findFinal(x,4'd6) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd6);
+			end
+			if(findFinal(x,4'd7) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd7);
+			end
+			if(findFinal(x,4'd8) != 0) begin
+				counte = counte + 1'd1;
+				differenc = differenc + findFinal(x,4'd8);
+			end
+			
+			if(counte == 8) begin
+				if(findFinal(x,4'd0) == 0) begin
 					case(45-differenc)
-						4'd1: maybes[728-9*(r*9+x)-:9] <= 9'b000000001;
-						4'd2: maybes[728-9*(r*9+x)-:9] <= 9'b000000010;
-						4'd3: maybes[728-9*(r*9+x)-:9] <= 9'b000000100;
-						4'd4: maybes[728-9*(r*9+x)-:9] <= 9'b000001000;
-						4'd5: maybes[728-9*(r*9+x)-:9] <= 9'b000010000;
-						4'd6: maybes[728-9*(r*9+x)-:9] <= 9'b000100000;
-						4'd7: maybes[728-9*(r*9+x)-:9] <= 9'b001000000;
-						4'd8: maybes[728-9*(r*9+x)-:9] <= 9'b010000000;
-						4'd9: maybes[728-9*(r*9+x)-:9] <= 9'b100000000;
+						4'd1: maybes[728-9*(0*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(0*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(0*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(0*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(0*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(0*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(0*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(0*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(0*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd1) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(1*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(1*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(1*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(1*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(1*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(1*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(1*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(1*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(1*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd2) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(2*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(2*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(2*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(2*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(2*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(2*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(2*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(2*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(2*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd3) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(3*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(3*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(3*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(3*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(3*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(3*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(3*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(3*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(3*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd4) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(4*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(4*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(4*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(4*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(4*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(4*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(4*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(4*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(4*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd5) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(5*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(5*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(5*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(5*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(5*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(5*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(5*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(5*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(5*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd6) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(6*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(6*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(6*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(6*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(6*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(6*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(6*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(6*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(6*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd7) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(7*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(7*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(7*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(7*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(7*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(7*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(7*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(7*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(7*9+x)-:9] <= 9'b100000000;
+					endcase
+				end
+				if(findFinal(x,4'd8) == 0) begin
+					case(45-differenc)
+						4'd1: maybes[728-9*(8*9+x)-:9] <= 9'b000000001;
+						4'd2: maybes[728-9*(8*9+x)-:9] <= 9'b000000010;
+						4'd3: maybes[728-9*(8*9+x)-:9] <= 9'b000000100;
+						4'd4: maybes[728-9*(8*9+x)-:9] <= 9'b000001000;
+						4'd5: maybes[728-9*(8*9+x)-:9] <= 9'b000010000;
+						4'd6: maybes[728-9*(8*9+x)-:9] <= 9'b000100000;
+						4'd7: maybes[728-9*(8*9+x)-:9] <= 9'b001000000;
+						4'd8: maybes[728-9*(8*9+x)-:9] <= 9'b010000000;
+						4'd9: maybes[728-9*(8*9+x)-:9] <= 9'b100000000;
 					endcase
 				end
 			end
 		end
-	end
 	endtask
 endmodule 
