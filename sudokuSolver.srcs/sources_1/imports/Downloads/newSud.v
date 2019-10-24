@@ -6,25 +6,30 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	//input[323:0] enter,
 	output reg readyToStart = 0,
 	output reg done = 0,
+	output reg borked = 0,
 	//output reg[323:0] outputs);
 	output reg[3:0] outputs = 4'b0000);
 	
 	reg [323:0] working;
 	reg [80:0]	finals;
 	reg backtrack = 0;
-	integer MC = 0,x = 0,y = 0,checkMe,colCount,rowCount;
-	integer f,a,b,r,s,inOutCount = 0;
-	parameter ready = 4'd0, load = 4'd1, tasks = 4'd2, finish = 4'd4;
+	reg [3:0] x = 4'd0, y = 4'd0;
+	integer MC = 0;
+	integer f,a,b,r,s,inOutCount = 32'd0;
+	parameter ready = 4'd0, load = 4'd1, tasks = 4'd2, finish = 4'd3;
 	
 	always @(posedge clk) begin
 		case(MC)
 			ready: begin
-				x <= 0;
-				y <= 0;
+				x <= 4'd0;
+				y <= 4'd0;
 				outputs <= 4'b0000;
 				done <= 0;
 				readyToStart <= 1;
 				backtrack <= 0;
+				inOutCount <= 32'd0;
+				borked <= 0;
+				finals <= 81'd0;
 				if(start == 1) begin
 					MC <= load;
 					readyToStart <= 0;
@@ -32,67 +37,74 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 			end
 			
 			load: begin
-				if(x == 8) begin
-					y <= y + 1;
-					x <= 0;
+				if(x == 4'd8) begin
+					y <= y + 1'd1;
+					x <= 4'd0;
 				end
 				else
-					x <= x + 1;
-				if(enter != 4'b0000) begin
-					working[323-4*(y*9+x)-:4] <= enter;
-					finals[81-(y*9+x)] <= 1;
-				end
-				inOutCount <= inOutCount + 1;
+					x <= x + 1'd1;
+					
+				if(enter != 4'b0000)
+					finals[80-(y*9+x)] <= 1;
+				else
+					finals[80-(y*9+x)] <= 0;
+				working[323-4*(y*9+x)-:4] <= enter;
+				inOutCount <= inOutCount + 1'd1;
 				
-				if(inOutCount == 81) begin
-					x <= 0;
-					y <= 0;
+				if(inOutCount == 32'd81) begin
+					x <= 4'd0;
+					y <= 4'd0;
 					MC <= tasks;
-					inOutCount <= 0;
+					inOutCount <= 32'd0;
 				end
 			end
 			
 			tasks: begin
-				if(finals[81-(y*9+x)] == 0) begin
-					backtrack <= 0;
-					working[323-4*(y*9+x)-:4] <= working[323-4*(y*9+x)-:4] + 1'd1;
-					
-					if(colChecker(working[323-4*(y*9+x)-:4]) == 1) begin
-						if(rowChecker(working[323-4*(y*9+x))-:4] == 1) begin
-							if(x == 8 && y == 8) begin
-								x <= 1'd0;
-								y <= 1'd0;
-								MC <= finish;
-							end
-							else if(x == 8) begin
-								y <= y - 1'd1;
-								x <= 1'd0;
-							end
-							else
-								x <= x + 1'd1;
-						end
-					end
-					//squareChecker(working[323-4*(y*9+x)-:4]);
-					if(working[323-4*(y*9+x)-:4] == 9) begin
+				if(finals[80-(y*9+x)] == 0) begin
+					if(working[323-4*(y*9+x)-:4] == 4'd8) begin
 						backtrack <= 1;
-						if(x == 0 && y == 0) begin
+						working[323-4*(y*9+x)-:4] <= 4'd0;
+						if(x == 4'd0 && y == 4'd0) begin
 							//if it gets here, shit is fucked. cannot be solved
+							borked <= 1;
 							MC <= ready;
 						end
-						else if(x == 0) begin
+						else if(x == 4'd0) begin
 							y <= y - 1'd1;
 							x <= 4'd8;
 						end
 						else 
 							x <= x - 1'd1;
 					end
+					else begin
+						working[323-4*(y*9+x)-:4] <= working[323-4*(y*9+x)-:4] + 1'd1;
+						backtrack <= 0;
+						if(colChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+							if(rowChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+								//if(squareChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+									if(x == 4'd8 && y == 4'd8) begin
+										x <= 4'd0;
+										y <= 4'd0;
+										MC <= finish;
+									end
+									else if(x == 4'd8) begin
+										y <= y + 1'd1;
+										x <= 4'd0;
+									end
+									else
+										x <= x + 1'd1;
+								//end
+							end
+						end
+					end
 				end
 				else if (backtrack == 1) begin
-					if(x == 0 && y == 0) begin
+					if(x == 4'd0 && y == 4'd0) begin
 						//if it gets here, shit is fucked. cannot be solved
+						borked <= 1;
 						MC <= ready;
 					end
-					else if(x == 0) begin
+					else if(x == 4'd0) begin
 						y <= y - 1'd1;
 						x <= 4'd8;
 					end
@@ -101,14 +113,14 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				end
 				else begin
 					backtrack <= 0;
-					if(x == 8 && y == 8) begin
-						x <= 1'd0;
-						y <= 1'd0;
+					if(x == 4'd8 && y == 4'd8) begin
+						x <= 4'd0;
+						y <= 4'd0;
 						MC <= finish;
 					end
-					else if(x == 8) begin
+					else if(x == 4'd8) begin
 						y <= y + 1'd1;
-						x <= 1'd0;
+						x <= 4'd0;
 					end
 					else
 						x <= x + 1'd1;
@@ -116,9 +128,9 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 			end
 			
 			finish: begin
-				if(x == 8) begin
+				if(x == 4'd8) begin
 					y <= y + 1'd1;
-					x <= 1'd0;
+					x <= 4'd0;
 				end
 				else
 					x <= x + 1'd1;
@@ -126,7 +138,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				outputs <= working[323-4*(y*9+x)-:4];
 				inOutCount <= inOutCount + 1'd1;
 				
-				if(inOutCount == 81) begin
+				if(inOutCount == 32'd81) begin
 					MC <= ready;
 					done <= 0;
 					inOutCount <= 0;
@@ -150,9 +162,9 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	//rowchecker function
 	function[0:0] rowChecker;								//COUNTS HOW MANY TIMES A NUMBER SHOWS UP IN A ROW. CHANGED THE checkMeS AND checkMeS
 		input[3:0] checkMe;
-		reg[2:0] rowCount;
+		reg[3:0] rowCount;
 		begin
-			rowCount = 3'd0;
+			rowCount = 4'd0;
 			if(working[323-4*(y*9+0)-:4] == checkMe)
 				rowCount = rowCount + 1'd1;
 			if(working[323-4*(y*9+1)-:4] == checkMe)
@@ -182,9 +194,9 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	//colchecker function
 	function[0:0] colChecker;
 		input[3:0] checkMe;
-		reg[2:0] colCount;
+		reg[3:0] colCount;
 		begin
-			colCount = 3'd0;
+			colCount = 4'd0;
 			if(working[323-4*(0*9+x)-:4] == checkMe)
 				colCount = colCount + 1'd1;
 			if(working[323-4*(1*9+x)-:4] == checkMe)
@@ -204,7 +216,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 			if(working[323-4*(8*9+x)-:4] == checkMe)
 				colCount = colCount + 1'd1;
 			
-			if(rowCount > 4'd1)
+			if(colCount > 4'd1)
 				colChecker = 0;
 			else 
 				colChecker = 1;
