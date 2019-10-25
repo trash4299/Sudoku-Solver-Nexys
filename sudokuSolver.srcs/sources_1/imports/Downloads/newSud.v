@@ -193,27 +193,27 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	
 	//colchecker function
 	function[0:0] colChecker;
-		input[3:0] checkMe;
+		input[3:0] checkMee;
 		reg[3:0] colCount;
 		begin
 			colCount = 4'd0;
-			if(working[323-4*(0*9+x)-:4] == checkMe)
+			if(working[323-4*(0*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(1*9+x)-:4] == checkMe)
+			if(working[323-4*(1*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(2*9+x)-:4] == checkMe)
+			if(working[323-4*(2*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(3*9+x)-:4] == checkMe)
+			if(working[323-4*(3*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(4*9+x)-:4] == checkMe)
+			if(working[323-4*(4*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(5*9+x)-:4] == checkMe)
+			if(working[323-4*(5*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(6*9+x)-:4] == checkMe)
+			if(working[323-4*(6*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(7*9+x)-:4] == checkMe)
+			if(working[323-4*(7*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
-			if(working[323-4*(8*9+x)-:4] == checkMe)
+			if(working[323-4*(8*9+x)-:4] == checkMee)
 				colCount = colCount + 1'd1;
 			
 			if(colCount > 4'd1)
@@ -224,4 +224,47 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	endfunction
 	
 	// squarechecker function
+	function[0:0] squareChecker;
+		input[3:0] checkMeee;
+		reg[3:0] squareCount;
+		integer a,b;
+		begin
+			if(x <= 4'd2)
+				a = 0;
+			else if(x <= 4'd5)
+				a = 1;
+			else //if(x <= 4'd8)
+				a = 2;
+				
+			if(y <= 4'd2)
+				b = 0;
+			else if(y <= 4'd5)
+				b = 1;
+			else //if(y <= 4'd8)
+				b = 2;
+			
+			if(x != 3*a) begin
+				if(y != 3*b) begin
+					if(working[323-4*((3*b)*9+(3*a))-:4] == checkMeee)
+						squareCount = squareCount + 1'd1;
+				end
+			end
+			if(x != 3*a+1) begin
+				if(y != 3*b+1) begin
+					if(working[323-4*((3*b+1)*9+(3*a+1))-:4] == checkMeee)
+						squareCount = squareCount + 1'd1;
+				end
+			end
+			if(x != 3*a+2) begin
+				if(y != 3*b+2) begin
+					if(working[323-4*((3*b+2)*9+(3*a+2))-:4] == checkMeee)
+						squareCount = squareCount + 1'd1;
+				end
+			end
+			
+			if(squareCount > 4'd1)
+				squareChecker = 0;
+			else
+				squareChecker = 1;
+		end
 endmodule 
