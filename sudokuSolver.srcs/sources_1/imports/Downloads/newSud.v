@@ -267,4 +267,5 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 			else
 				squareChecker = 1;
 		end
+	endfunction
 endmodule 
