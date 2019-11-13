@@ -6,4 +6,4 @@ Hi, I am only uploading some of the files for the time being. When I get further
 I need to fix my sudoku module so that I can actually fit it on to the FPGA. Rght now, my design would use over 200% of the LUTs on the Nexys Video. The solver module is currently would need about 291,000 LUTs when I only have about 110,000 available for it. There are lots of things I could improve on and minimize and I am slowly learning and figuring them out. 
 I know I could put the actual solving in C in the SDK and use the microblaze, but I want a challenge by coding in a non-OOP language. Making a C version is probably next.
 
-I a Dumb. So tasks are NOT synthesizable so changing those might be helpful. Anyways, I am working on creating a simpler solver module. It will be closer to how the recursive solver flowed where it just does trial and error and checks for three rules. My initial new solver is already a lot better.
+I will be merging the NewSudoku branch into the master soon. 
