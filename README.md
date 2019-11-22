@@ -1,3 +1,4 @@
+
 # Sudoku-Solver-Nexys
 A Sudoku Solver FPGA using the Nexys Video board that takes input through HDMI and outputs to a screen using HDMI.
 
@@ -7,4 +8,5 @@ I am currently working on fixing timing issues with the rgb2dvi, dvi2rgb, axi_vd
 
 I know I could put the actual solving in C in the SDK and use the microblaze, but I want a challenge by coding in a non-OOP language. Making a C version is probably next.
 
-I am thinking of making a block that always streams parts of the working register and the x and y of it so that the user can see what the solver is trying. The solver works in simulations.
+I am thinking of making a block that always streams parts of the working register and the x and y of it so that I can have it displayed on the screen as it is trying solutions.
+
