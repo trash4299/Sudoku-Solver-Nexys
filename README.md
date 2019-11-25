@@ -11,3 +11,5 @@ I know I could put the actual solving in C in the SDK and use the microblaze, bu
 I am thinking of making a block that always streams parts of the working register and the x and y of it so that I can have it displayed on the screen as it is trying solutions.
 
 I am thinking about using AXIStream to add the working register to memory rather than have it contained in the module. But I would need to change the main FSM to work with multi clock cycles.
+
+At the end of the year, I am going home and then back to school so I will not have access to Vivado software to work on this project. I am not sure how much time I will have to work on this, but I want to finish this project by the end of the school year (May 2020). 
