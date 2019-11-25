@@ -10,3 +10,4 @@ I know I could put the actual solving in C in the SDK and use the microblaze, bu
 
 I am thinking of making a block that always streams parts of the working register and the x and y of it so that I can have it displayed on the screen as it is trying solutions.
 
+I am thinking about using AXIStream to add the working register to memory rather than have it contained in the module. But I would need to change the main FSM to work with multi clock cycles.
