@@ -1,21 +1,41 @@
-`timescale 1ns / 1ps
+`timescale 1ns/1ps
+
+/*	Thoughts/Stuff I might want to do/Things I need to fix
+	
+	maybe replace working[323-4*(y*9+x)-:4] with currentCell
+		assign [3:0] currentCell = working[323-4*(y*9+x)-:4];
+		
+	makex, y, and currentCell outputs (wire) so I can stream what it is current working on. This requires some C code tho
+	
+*/
+
+/* Notes
+	cell (1,1) is top left
+*/
+
+
 module sudoku_v(//start,clk,enter,readyToStart,done,out);
 	input start,
 	input clk,
 	input[3:0] enter,
 	//input[323:0] enter,
-	output reg readyToStart = 0,
-	output reg done = 0,
-	output reg borked = 0,
+	output reg readyToStart = 1'b0,
+	output reg done = 1'b0,
+	output reg borked = 1'b0,
 	//output reg[323:0] outputs);
 	output reg[3:0] outputs = 4'b0000);
 	
-	reg [323:0] working;
-	reg [80:0]	finals;
+	reg	start_reg = 1'b0;
+	reg [323:0] working = 324'b0;
+	reg [80:0]	finals = 81'b0;
 	reg backtrack = 0;
 	reg [3:0] x = 4'd0, y = 4'd0;
-	integer MC = 0, inOutCount = 0;
-	parameter ready = 4'd0, load = 4'd1, tasks = 4'd2, finish = 4'd3;
+	integer MC = 32'd0, inOutCount = 32'd0;
+	localparam ready = 32'd0, load = 32'd1, tasks = 32'd2, finish = 32'd3, check1 = 32'd4, check2 = 32'd5, check3 = 32'd6;
+	
+	always @(posedge clk) begin
+		start_reg = start;
+	end
 	
 	always @(posedge clk) begin
 		case(MC)
@@ -23,13 +43,13 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				x <= 4'd0;
 				y <= 4'd0;
 				outputs <= 4'b0000;
-				done <= 0;
-				readyToStart <= 1;
-				backtrack <= 0;
+				done <= 1'b0;
+				readyToStart <= 1'b1;
+				backtrack <= 1'b0;
 				inOutCount <= 32'd0;
-				borked <= 0;
+				borked <= 1'b0;
 				finals <= 81'd0;
-				if(start == 1) begin
+				if(start_reg == 1) begin
 					MC <= load;
 					readyToStart <= 0;
 				end
@@ -42,20 +62,21 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				end
 				else
 					x <= x + 1'd1;
-					
-				if(enter != 4'b0000)
+				
+				if(enter != 4'd0)
 					finals[80-(y*9+x)] <= 1;
 				else
 					finals[80-(y*9+x)] <= 0;
 				working[323-4*(y*9+x)-:4] <= enter;
 				inOutCount <= inOutCount + 1'd1;
 				
-				if(inOutCount == 32'd81) begin
+				if(inOutCount == 32'd80) begin
 					x <= 4'd0;
 					y <= 4'd0;
 					MC <= tasks;
 					inOutCount <= 32'd0;
 				end
+				
 			end
 			
 			tasks: begin
@@ -65,8 +86,9 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 						working[323-4*(y*9+x)-:4] <= 4'd0;
 						if(x == 4'd0 && y == 4'd0) begin
 							//if it gets here, shit is fucked. cannot be solved
-							borked <= 1;
-							MC <= ready;
+							//borked <= 1;
+							//MC <= ready;
+							working[323-4*(y*9+x)-:4] <= 4'd0; //try starting over same cell at 0. but i mean it is brute forcing it so if it hits here, it is borked
 						end
 						else if(x == 4'd0) begin
 							y <= y - 1'd1;
@@ -76,8 +98,10 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 							x <= x - 1'd1;
 					end
 					else begin
-						working[323-4*(y*9+x)-:4] = working[323-4*(y*9+x)-:4] + 1'd1;
+						working[323-4*(y*9+x)-:4] <= working[323-4*(y*9+x)-:4] + 1'd1;
 						backtrack <= 0;
+						MC <= check1;
+						/*
 						if(colChecker(working[323-4*(y*9+x)-:4]) == 1) begin
 							if(rowChecker(working[323-4*(y*9+x)-:4]) == 1) begin
 								if(squareChecker(working[323-4*(y*9+x)-:4]) == 1) begin
@@ -95,6 +119,7 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 								end
 							end
 						end
+						*/
 					end
 				end
 				else if (backtrack == 1) begin
@@ -128,6 +153,66 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				end
 			end
 			
+			check1 : begin
+				/*
+				if(colChecker(working[323-4*(y*9+x)-:4]) == 1)
+					MC <= check2;
+				else begin
+					MC <= tasks;
+				end
+				*/
+				
+				if(colChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+					if(rowChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+						if(squareChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+							if(x == 4'd8 && y == 4'd8) begin
+								x <= 4'd0;
+								y <= 4'd0;
+								MC <= finish;
+							end
+							else if(x == 4'd8) begin
+								y <= y + 1'd1;
+								x <= 4'd0;
+							end
+							else
+								x <= x + 1'd1;
+						end
+						else
+							MC <= tasks;
+					end
+					else
+						MC <= tasks;
+				end
+				else
+					MC <= tasks;
+			end
+			
+			// check2 : begin
+				// if(rowChecker(working[323-4*(y*9+x)-:4]) == 1)
+					// MC <= check3;
+				// else begin
+					// MC <= tasks;
+				// end
+			// end
+			
+			// check3 : begin
+				// if(squareChecker(working[323-4*(y*9+x)-:4]) == 1) begin
+					// if(x == 4'd8 && y == 4'd8) begin
+						// x <= 4'd0;
+						// y <= 4'd0;
+						// MC <= finish;
+					// end
+					// else if(x == 4'd8) begin
+						// y <= y + 1'd1;
+						// x <= 4'd0;
+					// end
+					// else
+						// x <= x + 1'd1;
+				// end
+				// else
+					// MC <= tasks;
+			// end
+			
 			finish: begin
 				if(x == 4'd8) begin
 					y <= y + 1'd1;
@@ -135,11 +220,11 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				end
 				else
 					x <= x + 1'd1;
-				
+					
 				outputs <= working[323-4*(y*9+x)-:4];
 				inOutCount <= inOutCount + 1'd1;
 				
-				if(inOutCount == 32'd80) begin
+				if(inOutCount == 32'd81) begin
 					MC <= ready;
 					done <= 0;
 					inOutCount <= 0;
@@ -148,20 +233,8 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 		endcase
 	end
 	
-	//Assigns outputs
-//	genvar igloo,hi;
-//	generate
-//		for(igloo = 0; igloo < 9; igloo = igloo + 1) begin : row1
-//			for(hi = 0; hi < 9; hi = hi + 1) begin : column1
-//				always@(clk) begin
-//					outputs[323-4*(igloo*9+hi)-:4] <= findFinal(hi,igloo);
-//				end
-//			end
-//		end
-//	endgenerate
-	
 	//rowchecker function
-	function automatic [0:0]  rowChecker;								//COUNTS HOW MANY TIMES A NUMBER SHOWS UP IN A ROW. CHANGED THE checkMeS AND checkMeS
+	function automatic [0:0]  rowChecker;			//COUNTS HOW MANY TIMES A NUMBER SHOWS UP IN A ROW
 		input[3:0] checkMe;
 		reg[3:0] rowCount;
 		begin
@@ -236,14 +309,14 @@ module sudoku_v(//start,clk,enter,readyToStart,done,out);
 				a = 1;
 			else //if(x <= 4'd8)
 				a = 2;
-				
+			
 			if(y <= 4'd2)
 				b = 0;
 			else if(y <= 4'd5)
 				b = 1;
 			else //if(y <= 4'd8)
 				b = 2;
-										//ADD IN THE OTHER 6 CHECKS ITS NEEDS TO PERFORM IN THE SQUARE
+			
 			if(x != 3*a) begin
 				if(y != 3*b) begin
 					if(working[323-4*((3*b)*9+(3*a))-:4] == checkMeee)
