@@ -12,4 +12,10 @@ I am thinking of making a block that always streams parts of the working registe
 
 I am thinking about using AXIStream to add the working register to memory rather than have it contained in the module. But I would need to change the main FSM to work with multi clock cycles.
 
-At the end of the year, I am going home and then back to school so I will not have access to Vivado software to work on this project. I am not sure how much time I will have to work on this, but I want to finish this project by the end of the school year (May 2020). 
+
+Hi, I am back to school and I just installed Vivado up on my machine, but I am getting some weird problems. I think I exported it and imported my project wrong so there is something weird going on with the file paths. I may or may not copy the block deisgn and sources to a new project and start over. Also on my to-do list is figuring out how to get Vivado generated tcl scripts so that the block design can copied easily.
+I am not sure how much time I will have to work on this, but I want to finish this project by the end of the school year (May 2020). 
+
+
+Future future plans:
+After I finish this project, I want to add on more to the GUI so that the user can upload a hand-written partially completed Sudoku puzzle and use machine learning to decipher numbers and solve it. But that is a little bit aways. 
